@@ -85,7 +85,6 @@ class btagSFProducer(Module):
                 '2017' : {
                     'inputFileName' : "DeepCSV_94XSF_V2_B_F.csv",
                     'inputFastSimFileName' : "deepcsv_13TEV_17SL_18_3_2019.csv",
-                    'inputFileName' : "DeepCSV_94XSF_V4_B_F.csv",
                     'measurement_types' : {
                         0 : "comb",  # b
                         1 : "comb",  # c
@@ -95,9 +94,7 @@ class btagSFProducer(Module):
                 },
                 '2018' : {
                     'inputFileName' : "DeepCSV_102XSF_V1.csv",
-<<<<<<< HEAD
                     'inputFastSimFileName' : "deepcsv_13TEV_18SL_7_5_2019.csv",
-=======
                     'measurement_types' : {
                         0 : "comb",  # b
                         1 : "comb",  # c
@@ -109,7 +106,6 @@ class btagSFProducer(Module):
             'deepjet' : {
                 'Legacy2016' : {
                     'inputFileName' : "DeepJet_2016LegacySF_V1.csv",
->>>>>>> 8c2b19fc5fc90859ed1427e4daf916f19427c616
                     'measurement_types' : {
                         0 : "comb",  # b
                         1 : "comb",  # c
@@ -117,8 +113,6 @@ class btagSFProducer(Module):
                     },
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 },
-<<<<<<< HEAD
-=======
                 '2017' : {
                     'inputFileName' : "DeepFlavour_94XSF_V3_B_F.csv",
                     'measurement_types' : {
@@ -137,7 +131,6 @@ class btagSFProducer(Module):
                     },
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 }    
->>>>>>> 8c2b19fc5fc90859ed1427e4daf916f19427c616
             },
             'cmva' : {
                 '2016' : {
