@@ -31,13 +31,15 @@ class btagSFProducer(Module):
     """Calculate btagging scale factors
         algo has to be either 'csvv2' or 'cmva'
     """
-    def __init__(self, era, algo = 'csvv2', sfFileName = None, verbose = 0):
+    def __init__(self, era, algo = 'csvv2', doFastSim = False, sfFileName = None, verbose = 0):
 
         self.era = era
 
         self.algo = algo.lower()
 
         self.verbose = verbose
+
+        self.doFastSim = doFastSim
 
         # CV: Return value of BTagCalibrationReader::eval_auto_bounds() is zero
         #     in case jet abs(eta) > 2.4 !!
@@ -70,15 +72,36 @@ class btagSFProducer(Module):
                 }
             },
             'deepcsv' : {
-                '2017' : {
-                    'inputFileName' : "DeepCSV_94XSF_V2_B_F.csv",
+                'Legacy2016' : {
+                    'inputFileName' : "DeepCSV_2016LegacySF_V1.csv",
+                    'inputFastSimFileName' : "deepcsv_13TEV_16SL_18_3_2019.csv",
                     'measurement_types' : {
                         0 : "comb",  # b
                         1 : "comb",  # c
                         2 : "incl"   # light
                     },
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
-                }
+                },
+                '2017' : {
+                    'inputFileName' : "DeepCSV_94XSF_V2_B_F.csv",
+                    'inputFastSimFileName' : "deepcsv_13TEV_17SL_18_3_2019.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
+                '2018' : {
+                    'inputFileName' : "DeepCSV_102XSF_V1.csv",
+                    'inputFastSimFileName' : "deepcsv_13TEV_18SL_7_5_2019.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
             },
             'cmva' : {
                 '2016' : {
@@ -101,6 +124,11 @@ class btagSFProducer(Module):
             if self.era in supported_btagSF[self.algo].keys():
                 if self.inputFileName is None:
                     self.inputFileName = supported_btagSF[self.algo][self.era]['inputFileName']
+                if self.doFastSim:
+                    if 'inputFastSimFileName' in supported_btagSF[self.algo][self.era].keys():
+                        self.inputFastSimFileName = supported_btagSF[self.algo][self.era]['inputFastSimFileName']
+                    else:
+                        self.doFastSim = False
                 self.measurement_types = supported_btagSF[self.algo][self.era]['measurement_types']
                 self.supported_wp = supported_btagSF[self.algo][self.era]['supported_wp']
             else:
@@ -144,11 +172,16 @@ class btagSFProducer(Module):
         self.central_and_systs_shape_corr.extend(self.systs_shape_corr)
 
         self.branchNames_central_and_systs = {}
+        self.branchNames_central_and_systs_fastsim = {}
         for central_or_syst in self.central_and_systs:
             if central_or_syst == "central":
                 self.branchNames_central_and_systs[central_or_syst] = "Jet_btagSF"
+                if self.doFastSim:
+                    self.branchNames_central_and_systs_fastsim[central_or_syst] = "Jet_btagFastSimSF"
             else:
                 self.branchNames_central_and_systs[central_or_syst] = "Jet_btagSF_%s" % central_or_syst
+                if self.doFastSim:
+                    self.branchNames_central_and_systs_fastsim[central_or_syst] = "Jet_btagFastSimSF_%s" % central_or_syst
 
         self.branchNames_central_and_systs_shape_corr = {}
         for central_or_syst in self.central_and_systs_shape_corr:
@@ -162,6 +195,9 @@ class btagSFProducer(Module):
         # (cf. https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration )
         self.calibration = ROOT.BTagCalibration(self.algo, os.path.join(self.inputFilePath, self.inputFileName))
         self.readers = {}
+        if self.doFastSim:
+            self.calibration_fastsim = ROOT.BTagCalibration(self.algo, os.path.join(self.inputFilePath, self.inputFastSimFileName))
+            self.readers_fastsim = {}
         for wp in self.supported_wp:
             wp_btv = { "l" : 0, "m" : 1, "t" : 2, "shape_corr" : 3 }.get(wp.lower(), None)
             syts = None
@@ -173,12 +209,18 @@ class btagSFProducer(Module):
             for syst in systs:
                 v_systs.push_back(syst)
             reader = ROOT.BTagCalibrationReader(wp_btv, 'central', v_systs)
+            if self.doFastSim==True and wp_btv in [ 0, 1, 2 ]:
+                reader_fastsim = ROOT.BTagCalibrationReader(wp_btv, 'central', v_systs)
             for flavor_btv in [ 0, 1, 2 ]:
                 if wp == "shape_corr":
                     reader.load(self.calibration, flavor_btv, 'iterativefit')
                 else:
                     reader.load(self.calibration, flavor_btv, self.measurement_types[flavor_btv])
+                    if self.doFastSim:
+                        reader_fastsim.load(self.calibration_fastsim, flavor_btv, 'fastsim')
             self.readers[wp_btv] = reader
+            if self.doFastSim:
+                self.readers_fastsim[wp_btv] = reader_fastsim
 
     def endJob(self):
         pass
@@ -187,13 +229,15 @@ class btagSFProducer(Module):
         self.out = wrappedOutputTree
         for central_or_syst in self.central_and_systs:
             self.out.branch(self.branchNames_central_and_systs[central_or_syst], "F", lenVar="nJet")
+            if self.doFastSim:
+                self.out.branch(self.branchNames_central_and_systs_fastsim[central_or_syst], "F", lenVar="nJet")
         for central_or_syst in self.central_and_systs_shape_corr:
             self.out.branch(self.branchNames_central_and_systs_shape_corr[central_or_syst], "F", lenVar="nJet")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
 
-    def getReader(self, wp, shape_corr = False):
+    def getReader(self, wp, shape_corr = False, useFastSim = False):
         """
             Get btag scale factor reader.
             Convert working points: input is 'L', 'M', 'T', 'shape_corr' to 0, 1, 2, 3
@@ -205,7 +249,10 @@ class btagSFProducer(Module):
             if self.verbose > 0:
                 print("WARNING: Unknown working point '%s', setting b-tagging SF reader to None!" % wp)
             return None
-        return self.readers[wp_btv]
+        if useFastSim:
+            return self.readers_fastsim[wp_btv]
+        else:
+            return self.readers[wp_btv]
 
     def getFlavorBTV(self, flavor):
         '''
@@ -277,6 +324,13 @@ class btagSFProducer(Module):
             central_or_syst = central_or_syst.lower()
             scale_factors = list(self.getSFs(preloaded_jets, central_or_syst, reader, 'auto', False))
             self.out.fillBranch(self.branchNames_central_and_systs[central_or_syst], scale_factors)
+        # fastsim
+        if self.doFastSim:
+            reader = self.getReader('M', False, True)
+            for central_or_syst in self.central_and_systs:
+                central_or_syst = central_or_syst.lower()
+                scale_factors = list(self.getSFs(preloaded_jets, central_or_syst, reader, 'auto', False))
+                self.out.fillBranch(self.branchNames_central_and_systs_fastsim[central_or_syst], scale_factors)
         # shape corrections
         reader = self.getReader('shape_corr', True)
         for central_or_syst in self.central_and_systs_shape_corr:
