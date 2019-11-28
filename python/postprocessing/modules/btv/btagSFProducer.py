@@ -85,6 +85,7 @@ class btagSFProducer(Module):
                 '2017' : {
                     'inputFileName' : "DeepCSV_94XSF_V2_B_F.csv",
                     'inputFastSimFileName' : "deepcsv_13TEV_17SL_18_3_2019.csv",
+                    'inputFileName' : "DeepCSV_94XSF_V4_B_F.csv",
                     'measurement_types' : {
                         0 : "comb",  # b
                         1 : "comb",  # c
@@ -94,7 +95,21 @@ class btagSFProducer(Module):
                 },
                 '2018' : {
                     'inputFileName' : "DeepCSV_102XSF_V1.csv",
+<<<<<<< HEAD
                     'inputFastSimFileName' : "deepcsv_13TEV_18SL_7_5_2019.csv",
+=======
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"] 
+                }    
+            },
+            'deepjet' : {
+                'Legacy2016' : {
+                    'inputFileName' : "DeepJet_2016LegacySF_V1.csv",
+>>>>>>> 8c2b19fc5fc90859ed1427e4daf916f19427c616
                     'measurement_types' : {
                         0 : "comb",  # b
                         1 : "comb",  # c
@@ -102,6 +117,27 @@ class btagSFProducer(Module):
                     },
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 },
+<<<<<<< HEAD
+=======
+                '2017' : {
+                    'inputFileName' : "DeepFlavour_94XSF_V3_B_F.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
+                '2018' : {
+                    'inputFileName' : "DeepJet_102XSF_V1.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                }    
+>>>>>>> 8c2b19fc5fc90859ed1427e4daf916f19427c616
             },
             'cmva' : {
                 '2016' : {
@@ -143,6 +179,8 @@ class btagSFProducer(Module):
             algoLabel = "deep-CSV (b)"
         elif self.algo == "cmva":
             algoLabel = "cMVA"
+        elif self.algo == "deepjet":
+            algoLabel = "DeepJet"
         else:
             raise ValueError("ERROR: Algorithm '%s' not supported for era = '%s'! Please choose among { %s }." % (self.algo, self.era, supported_algos))
         print("Loading btagSF weights for %s algorithm from file '%s'" % (algoLabel, os.path.join(self.inputFilePath, self.inputFileName)))
@@ -315,6 +353,8 @@ class btagSFProducer(Module):
             discr = "btagDeepB"
         elif self.algo == "cmva":
             discr = "btagCMVA"
+        elif self.algo == "deepjet":
+            discr = "btagDeepFlavB"
         else:
             raise ValueError("ERROR: Invalid algorithm '%s'! Please choose either 'csvv2' or 'cmva'." % self.algo)
 
