@@ -83,7 +83,7 @@ class btagSFProducer(Module):
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 },
                 '2017' : {
-                    'inputFileName' : "DeepCSV_94XSF_V2_B_F.csv",
+                    'inputFileName' : "DeepCSV_94XSF_V4_B_F.csv",
                     'inputFastSimFileName' : "deepcsv_13TEV_17SL_18_3_2019.csv",
                     'measurement_types' : {
                         0 : "comb",  # b
