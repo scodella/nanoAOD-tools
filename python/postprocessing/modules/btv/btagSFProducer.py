@@ -36,7 +36,7 @@ class btagSFProducer(Module):
     """
 
     def __init__(
-            self, era, algo='csvv2', selectedWPs=['M', 'shape_corr'],
+            self, era, algo='csvv2', doFastSim=False, selectedWPs=['M', 'shape_corr'],
             sfFileName=None, verbose=0, jesSystsForShape=["jes"]
     ):
         self.era = era
@@ -44,6 +44,8 @@ class btagSFProducer(Module):
         self.selectedWPs = selectedWPs
         self.verbose = verbose
         self.jesSystsForShape = jesSystsForShape
+        self.doFastSim = doFastSim
+
         # CV: Return value of BTagCalibrationReader::eval_auto_bounds() is zero
         # in case jet abs(eta) > 2.4 !!
         self.max_abs_eta = 2.4
@@ -77,6 +79,7 @@ class btagSFProducer(Module):
             'deepcsv': {
                 'Legacy2016': {
                     'inputFileName': "DeepCSV_2016LegacySF_V1.csv",
+                    'inputFastSimFileName' : "deepcsv_13TEV_16SL_18_3_2019.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -86,6 +89,7 @@ class btagSFProducer(Module):
                 },
                 '2017': {
                     'inputFileName': "DeepCSV_94XSF_V4_B_F.csv",
+                    'inputFastSimFileName' : "deepcsv_13TEV_17SL_18_3_2019.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -95,6 +99,37 @@ class btagSFProducer(Module):
                 },
                 '2018': {
                     'inputFileName': "DeepCSV_102XSF_V1.csv",
+                    'inputFastSimFileName' : "deepcsv_13TEV_18SL_7_5_2019.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL16': {
+                    'inputFileName': "DeepCSV_2016LegacySF_V1.csv", # TO BE UPDATED
+                    'inputFastSimFileName' : "deepcsv_13TEV_16SL_18_3_2019.csv",  # TO BE UPDATED 
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL17': {
+                    'inputFileName': "DeepCSV_106XUL17SF.csv",
+                    'inputFastSimFileName' : "deepcsv_13TEV_17SL_18_3_2019.csv", # TO BE UPDATED
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL18': {
+                    'inputFileName': "DeepCSV_106XUL18SF.csv",
+                    'inputFastSimFileName' : "deepcsv_13TEV_18SL_7_5_2019.csv", # TO BE UPDATED
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -106,6 +141,7 @@ class btagSFProducer(Module):
             'deepjet': {
                 'Legacy2016': {
                     'inputFileName': "DeepJet_2016LegacySF_V1.csv",
+                    'inputFastSimFileName' : "DeepFlav_13TEV_16SL_18_3_2019.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -115,6 +151,7 @@ class btagSFProducer(Module):
                 },
                 '2017': {
                     'inputFileName': "DeepFlavour_94XSF_V3_B_F.csv",
+                    'inputFastSimFileName' : "DeepFlav_13TEV_17SL_18_3_2019.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -124,6 +161,37 @@ class btagSFProducer(Module):
                 },
                 '2018': {
                     'inputFileName': "DeepJet_102XSF_V1.csv",
+                    'inputFastSimFileName' : "DeepFlav_13TEV_18SL_7_5_2019.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL16': {
+                    'inputFileName': "DeepJet_2016LegacySF_V1.csv", # TO BE UPDATED
+                    'inputFastSimFileName' : "DeepFlav_13TEV_16SL_18_3_2019.csv", # TO BE UPDATED
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL17': {
+                    'inputFileName': "DeepJet_106XUL17SF.csv",
+                    'inputFastSimFileName' : "DeepFlav_13TEV_17SL_18_3_2019.csv", # TO BE UPDATED
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL18': {
+                    'inputFileName': "DeepJet_106XUL18SF.csv",
+                    'inputFastSimFileName' : "DeepFlav_13TEV_18SL_7_5_2019.csv", # TO BE UPDATED
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -153,6 +221,11 @@ class btagSFProducer(Module):
             if self.era in list(supported_btagSF[self.algo].keys()):
                 if self.inputFileName is None:
                     self.inputFileName = supported_btagSF[self.algo][self.era]['inputFileName']
+                if self.doFastSim:
+                    if 'inputFastSimFileName' in supported_btagSF[self.algo][self.era].keys():
+                        self.inputFastSimFileName = supported_btagSF[self.algo][self.era]['inputFastSimFileName']
+                    else:
+                        self.doFastSim = False
                 self.measurement_types = supported_btagSF[self.algo][self.era]['measurement_types']
                 self.supported_wp = supported_btagSF[self.algo][self.era]['supported_wp']
             else:
@@ -190,6 +263,7 @@ class btagSFProducer(Module):
         self.central_and_systs_shape_corr.extend(self.systs_shape_corr)
 
         self.branchNames_central_and_systs = {}
+        self.branchNames_central_and_systs_fastsim = {}
         for wp in self.selectedWPs:
             branchNames = {}
             if wp == 'shape_corr':
@@ -205,6 +279,10 @@ class btagSFProducer(Module):
                     branchNames[central_or_syst] = baseBranchName + \
                         '_' + central_or_syst
             self.branchNames_central_and_systs[wp] = branchNames
+            if self.doFastSim==True and wp!='shape_corr':
+                self.branchNames_central_and_systs_fastsim[wp] = {}
+                for central_or_syst in central_and_systs:
+                    self.branchNames_central_and_systs_fastsim[wp][central_or_syst] = branchNames[central_or_syst].replace('btagSF', 'btagFastSimSF')
 
     def beginJob(self):
         # initialize BTagCalibrationReader
@@ -212,6 +290,9 @@ class btagSFProducer(Module):
         self.calibration = ROOT.BTagCalibration(
             self.algo, os.path.join(self.inputFilePath, self.inputFileName))
         self.readers = {}
+        if self.doFastSim:
+            self.calibration_fastsim = ROOT.BTagCalibration(self.algo, os.path.join(self.inputFilePath, self.inputFastSimFileName))
+            self.readers_fastsim = {}
         for wp in self.selectedWPs:
             wp_btv = {"l": 0, "m": 1, "t": 2,
                       "shape_corr": 3}.get(wp.lower(), None)
@@ -224,13 +305,19 @@ class btagSFProducer(Module):
             for syst in systs:
                 v_systs.push_back(syst)
             reader = ROOT.BTagCalibrationReader(wp_btv, 'central', v_systs)
+            if self.doFastSim==True and wp_btv in [ 0, 1, 2 ]:
+                reader_fastsim = ROOT.BTagCalibrationReader(wp_btv, 'central', v_systs)
             for flavor_btv in [0, 1, 2]:
                 if wp == "shape_corr":
                     reader.load(self.calibration, flavor_btv, 'iterativefit')
                 else:
                     reader.load(self.calibration, flavor_btv,
                                 self.measurement_types[flavor_btv])
+                    if self.doFastSim:
+                        reader_fastsim.load(self.calibration_fastsim, flavor_btv, 'fastsim')
             self.readers[wp_btv] = reader
+            if self.doFastSim==True and wp_btv in [ 0, 1, 2 ]:
+                self.readers_fastsim[wp_btv] = reader_fastsim
 
     def endJob(self):
         pass
@@ -240,11 +327,15 @@ class btagSFProducer(Module):
         for central_or_syst in list(self.branchNames_central_and_systs.values()):
             for branch in list(central_or_syst.values()):
                 self.out.branch(branch, "F", lenVar="nJet")
+        if self.doFastSim:
+            for central_or_syst in self.branchNames_central_and_systs_fastsim.values():
+                for branch in central_or_syst.values():
+                    self.out.branch(branch, "F", lenVar="nJet")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
 
-    def getReader(self, wp):
+    def getReader(self, wp, useFastSim = False):
         """
             Get btag scale factor reader.
             Convert working points: input is 'L', 'M', 'T', 'shape_corr' to 0, 1, 2, 3
@@ -256,7 +347,10 @@ class btagSFProducer(Module):
                 print(
                     "WARNING: Unknown working point '%s', setting b-tagging SF reader to None!" % wp)
             return None
-        return self.readers[wp_btv]
+        if useFastSim:
+            return self.readers_fastsim[wp_btv]
+        else:
+            return self.readers[wp_btv]
 
     def getFlavorBTV(self, flavor):
         '''
@@ -339,6 +433,11 @@ class btagSFProducer(Module):
                     preloaded_jets, central_or_syst, reader, 'auto', isShape))
                 self.out.fillBranch(
                     self.branchNames_central_and_systs[wp][central_or_syst], scale_factors)
+            if self.doFastSim and not isShape:
+                reader_fastsim = self.getReader(wp, True)
+                for central_or_syst in self.central_and_systs:
+                    scale_factors = list(self.getSFs(preloaded_jets, central_or_syst, reader_fastsim, 'auto', isShape))
+                    self.out.fillBranch(self.branchNames_central_and_systs_fastsim[wp][central_or_syst], scale_factors)
         return True
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
