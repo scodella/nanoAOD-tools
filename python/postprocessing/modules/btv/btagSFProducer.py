@@ -107,7 +107,7 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL16': {
+                'UL2016': {
                     'inputFileName': "DeepCSV_2016LegacySF_V1.csv", # TO BE UPDATED
                     'inputFastSimFileName' : "deepcsv_13TEV_16SL_18_3_2019.csv",  # TO BE UPDATED 
                     'measurement_types': {
@@ -117,7 +117,7 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL17': {
+                'UL2017': {
                     'inputFileName': "DeepCSV_106XUL17SF.csv",
                     'inputFastSimFileName' : "deepcsv_13TEV_17SL_18_3_2019.csv", # TO BE UPDATED
                     'measurement_types': {
@@ -127,7 +127,7 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL18': {
+                'UL2018': {
                     'inputFileName': "DeepCSV_106XUL18SF.csv",
                     'inputFastSimFileName' : "deepcsv_13TEV_18SL_7_5_2019.csv", # TO BE UPDATED
                     'measurement_types': {
@@ -169,7 +169,7 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL16': {
+                'UL2016': {
                     'inputFileName': "DeepJet_2016LegacySF_V1.csv", # TO BE UPDATED
                     'inputFastSimFileName' : "DeepFlav_13TEV_16SL_18_3_2019.csv", # TO BE UPDATED
                     'measurement_types': {
@@ -179,7 +179,7 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL17': {
+                'UL2017': {
                     'inputFileName': "DeepJet_106XUL17SF.csv",
                     'inputFastSimFileName' : "DeepFlav_13TEV_17SL_18_3_2019.csv", # TO BE UPDATED
                     'measurement_types': {
@@ -189,7 +189,7 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL18': {
+                'UL2018': {
                     'inputFileName': "DeepJet_106XUL18SF.csv",
                     'inputFastSimFileName' : "DeepFlav_13TEV_18SL_7_5_2019.csv", # TO BE UPDATED
                     'measurement_types': {
