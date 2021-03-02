@@ -36,7 +36,7 @@ class btagSFProducer(Module):
     """
 
     def __init__(
-            self, era, algo='csvv2', doFastSim=False, selectedWPs=['M', 'shape_corr'],
+            self, era, algo='csvv2', doFastSim=False, addCorrelations=False, selectedWPs=['M', 'shape_corr'],
             sfFileName=None, verbose=0, jesSystsForShape=["jes"]
     ):
         self.era = era
@@ -45,6 +45,7 @@ class btagSFProducer(Module):
         self.verbose = verbose
         self.jesSystsForShape = jesSystsForShape
         self.doFastSim = doFastSim
+        self.addCorrelations = addCorrelations
 
         # CV: Return value of BTagCalibrationReader::eval_auto_bounds() is zero
         # in case jet abs(eta) > 2.4 !!
@@ -118,7 +119,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2017': {
-                    'inputFileName': "DeepCSV_106XUL17SF.csv",
+                    'inputFileName': "DeepCSV_106XUL17SF_YearCorrelation-V1.csv",
                     'inputFastSimFileName' : "deepcsv_13TEV_17SL_18_3_2019.csv", # TO BE UPDATED
                     'measurement_types': {
                         0: "comb",  # b
@@ -128,7 +129,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2018': {
-                    'inputFileName': "DeepCSV_106XUL18SF.csv",
+                    'inputFileName': "DeepCSV_106XUL18SF_YearCorrelation-V1.csv",
                     'inputFastSimFileName' : "deepcsv_13TEV_18SL_7_5_2019.csv", # TO BE UPDATED
                     'measurement_types': {
                         0: "comb",  # b
@@ -180,7 +181,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2017': {
-                    'inputFileName': "DeepJet_106XUL17SF.csv",
+                    'inputFileName': "DeepJet_106XUL17SF_YearCorrelation-V1.csv",
                     'inputFastSimFileName' : "DeepFlav_13TEV_17SL_18_3_2019.csv", # TO BE UPDATED
                     'measurement_types': {
                         0: "comb",  # b
@@ -190,7 +191,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2018': {
-                    'inputFileName': "DeepJet_106XUL18SF.csv",
+                    'inputFileName': "DeepJet_106XUL18SF_YearCorrelation-V1.csv",
                     'inputFastSimFileName' : "DeepFlav_13TEV_18SL_7_5_2019.csv", # TO BE UPDATED
                     'measurement_types': {
                         0: "comb",  # b
@@ -249,8 +250,13 @@ class btagSFProducer(Module):
         self.systs = []
         self.systs.append("up")
         self.systs.append("down")
+        if self.addCorrelations:
+            self.systs.extend( [ 'up_correlated', 'down_correlated', 'up_uncorrelated', 'down_uncorrelated' ] )
         self.central_and_systs = ["central"]
         self.central_and_systs.extend(self.systs)
+
+        if self.doFastSim:
+            self.central_and_systs_fastsim = [ 'central', 'up', 'down' ]
 
         self.systs_shape_corr = []
         for syst in ['lf', 'hf',
@@ -279,9 +285,9 @@ class btagSFProducer(Module):
                     branchNames[central_or_syst] = baseBranchName + \
                         '_' + central_or_syst
             self.branchNames_central_and_systs[wp] = branchNames
-            if self.doFastSim==True and wp!='shape_corr':
+            if self.doFastSim and wp!='shape_corr':
                 self.branchNames_central_and_systs_fastsim[wp] = {}
-                for central_or_syst in central_and_systs:
+                for central_or_syst in self.central_and_systs_fastsim:
                     self.branchNames_central_and_systs_fastsim[wp][central_or_syst] = branchNames[central_or_syst].replace('btagSF', 'btagFastSimSF')
 
     def beginJob(self):
@@ -305,8 +311,12 @@ class btagSFProducer(Module):
             for syst in systs:
                 v_systs.push_back(syst)
             reader = ROOT.BTagCalibrationReader(wp_btv, 'central', v_systs)
-            if self.doFastSim==True and wp_btv in [ 0, 1, 2 ]:
-                reader_fastsim = ROOT.BTagCalibrationReader(wp_btv, 'central', v_systs)
+            if self.doFastSim and wp_btv in [ 0, 1, 2 ]:
+                v_systs_fastsim = getattr(ROOT, 'vector<string>')()
+                for syst in self.central_and_systs_fastsim:
+                    if syst!='central':
+                        v_systs_fastsim.push_back(syst)
+                reader_fastsim = ROOT.BTagCalibrationReader(wp_btv, 'central', v_systs_fastsim)
             for flavor_btv in [0, 1, 2]:
                 if wp == "shape_corr":
                     reader.load(self.calibration, flavor_btv, 'iterativefit')
@@ -316,7 +326,7 @@ class btagSFProducer(Module):
                     if self.doFastSim:
                         reader_fastsim.load(self.calibration_fastsim, flavor_btv, 'fastsim')
             self.readers[wp_btv] = reader
-            if self.doFastSim==True and wp_btv in [ 0, 1, 2 ]:
+            if self.doFastSim and wp_btv in [ 0, 1, 2 ]:
                 self.readers_fastsim[wp_btv] = reader_fastsim
 
     def endJob(self):
@@ -435,7 +445,7 @@ class btagSFProducer(Module):
                     self.branchNames_central_and_systs[wp][central_or_syst], scale_factors)
             if self.doFastSim and not isShape:
                 reader_fastsim = self.getReader(wp, True)
-                for central_or_syst in self.central_and_systs:
+                for central_or_syst in self.central_and_systs_fastsim:
                     scale_factors = list(self.getSFs(preloaded_jets, central_or_syst, reader_fastsim, 'auto', isShape))
                     self.out.fillBranch(self.branchNames_central_and_systs_fastsim[wp][central_or_syst], scale_factors)
         return True
