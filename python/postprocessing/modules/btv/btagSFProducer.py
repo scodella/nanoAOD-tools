@@ -386,10 +386,11 @@ class btagSFProducer(Module):
                     sf = reader.eval_auto_bounds(
                         'central', flavor_btv, eta, pt, discr)
             else:
-                if flavor_btv==2 and ('_correlated' in syst or '_uncorrelated' in syst):
-                    sf = reader.eval_auto_bounds('central', flavor_btv, eta, pt)
-                else:
-                    sf = reader.eval_auto_bounds(syst, flavor_btv, eta, pt)
+                #if flavor_btv==2 and ('_correlated' in syst or '_uncorrelated' in syst):
+                    #sf = reader.eval_auto_bounds('central', flavor_btv, eta, pt)
+                #else:
+                    #sf = reader.eval_auto_bounds(syst, flavor_btv, eta, pt)
+                sf = reader.eval_auto_bounds(syst, flavor_btv, eta, pt)
             # check if SF is OK
             if sf < 0.01:
                 if self.verbose > 0:
