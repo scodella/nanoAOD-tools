@@ -22,6 +22,10 @@ jecTagsFastSim = {
     '2016': 'Spring16_25nsFastSimV1_MC',
     '2017': 'Fall17_FastSimV1_MC',
     '2018': 'Autumn18_FastSimV1_MC',
+    'UL2016_preVFP': 'Summer19UL16APV_V7_MC', ## Placeholder
+    'UL2016': 'Summer19UL16_V7_MC', ## Placeholder
+    'UL2017': 'Summer19UL17_V6_MC', ## Placeholder
+    'UL2018': 'Summer19UL18_V5_MC', ## Placeholder
 }
 
 # https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC#Recommended_for_Data
