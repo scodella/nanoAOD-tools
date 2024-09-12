@@ -142,8 +142,8 @@ def createJMECorrector(isMC=True,
     jmsValues_ = jmsValues[dataYear]
     archiveTag_ = archiveTagsDATA[dataYear]
     met_ = metBranchName
-    print('JEC : ' + str(jecTag_) + '\t JER : ' + str(jerTag_))
-    print('MET branch : ' + str(met_))
+    print(('JEC : ' + str(jecTag_) + '\t JER : ' + str(jerTag_)))
+    print(('MET branch : ' + str(met_)))
     jmeCorrections = None
     # jme corrections
     if 'AK4' in jetType:

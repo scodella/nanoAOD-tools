@@ -243,7 +243,7 @@ class btagSFProducer(Module):
                 if self.inputFileName is None:
                     self.inputFileName = supported_btagSF[self.algo][self.era]['inputFileName']
                 if self.doFastSim:
-                    if 'inputFastSimFileName' in supported_btagSF[self.algo][self.era].keys():
+                    if 'inputFastSimFileName' in list(supported_btagSF[self.algo][self.era].keys()):
                         self.inputFastSimFileName = supported_btagSF[self.algo][self.era]['inputFastSimFileName']
                     else:
                         self.doFastSim = False
@@ -263,7 +263,7 @@ class btagSFProducer(Module):
         # load libraries for accessing b-tag scale factors (SFs) from conditions database
         for library in ["libCondFormatsBTauObjects", "libCondToolsBTau"]:
             if library not in ROOT.gSystem.GetLibraries():
-                print("Load Library '%s'" % library.replace("lib", ""))
+                print(("Load Library '%s'" % library.replace("lib", "")))
                 ROOT.gSystem.Load(library)
 
         # define systematic uncertainties
@@ -314,10 +314,10 @@ class btagSFProducer(Module):
         # initialize BTagCalibrationReader
         # (cf. https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration )
         self.calibration = ROOT.BTagCalibration(
-            self.algo, os.path.join(self.inputFilePath, self.inputFileName))
+            self.algo, os.path.join(self.inputFilePath, self.inputFileName), False)
         self.readers = {}
         if self.doFastSim:
-            self.calibration_fastsim = ROOT.BTagCalibration(self.algo, os.path.join(self.inputFilePath, self.inputFastSimFileName))
+            self.calibration_fastsim = ROOT.BTagCalibration(self.algo, os.path.join(self.inputFilePath, self.inputFastSimFileName), False)
             self.readers_fastsim = {}
         for wp in self.selectedWPs:
             wp_btv = {"l": 0, "m": 1, "t": 2,
@@ -358,8 +358,8 @@ class btagSFProducer(Module):
             for branch in list(central_or_syst.values()):
                 self.out.branch(branch, "F", lenVar="nJet")
         if self.doFastSim:
-            for central_or_syst in self.branchNames_central_and_systs_fastsim.values():
-                for branch in central_or_syst.values():
+            for central_or_syst in list(self.branchNames_central_and_systs_fastsim.values()):
+                for branch in list(central_or_syst.values()):
                     self.out.branch(branch, "F", lenVar="nJet")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -374,8 +374,8 @@ class btagSFProducer(Module):
                   "shape_corr": 3}.get(wp.lower(), None)
         if wp_btv is None or wp_btv not in list(self.readers.keys()):
             if self.verbose > 0:
-                print(
-                    "WARNING: Unknown working point '%s', setting b-tagging SF reader to None!" % wp)
+                print((
+                    "WARNING: Unknown working point '%s', setting b-tagging SF reader to None!" % wp))
             return None
         if useFastSim:
             return self.readers_fastsim[wp_btv]
@@ -397,8 +397,8 @@ class btagSFProducer(Module):
             flavor_btv = 2
         else:
             if self.verbose > 0:
-                print(
-                    "WARNING: Unknown flavor '%s', setting b-tagging SF to -1!" % repr(flavor))
+                print((
+                    "WARNING: Unknown flavor '%s', setting b-tagging SF to -1!" % repr(flavor)))
             return -1.
         return flavor_btv
 
@@ -434,8 +434,8 @@ class btagSFProducer(Module):
             # check if SF is OK
             if sf < 0.01:
                 if self.verbose > 0:
-                    print("jet #%i: pT = %1.1f, eta = %1.1f, discr = %1.3f, flavor = %i" % (
-                        idx, pt, eta, discr, flavor_btv))
+                    print(("jet #%i: pT = %1.1f, eta = %1.1f, discr = %1.3f, flavor = %i" % (
+                        idx, pt, eta, discr, flavor_btv)))
                 sf = 1.
             yield sf
 

@@ -65,10 +65,10 @@ class jetmetUncertaintiesProducer(Module):
             self.jerInputFileName = jerTag + "_PtResolution_" + jetType + ".txt"
             self.jerUncertaintyInputFileName = jerTag + "_SF_" + jetType + ".txt"
         else:
-            print(
+            print((
                 "WARNING: jerTag is empty!!! This module will soon be " \
                 + "deprecated! Please use jetmetHelperRun2 in the future."
-            )
+            ))
             if era == "2016":
                 self.jerInputFileName = "Summer16_25nsV1_MC_PtResolution_" + jetType + ".txt"
                 self.jerUncertaintyInputFileName = "Summer16_25nsV1_MC_SF_" + jetType + ".txt"
@@ -180,7 +180,7 @@ class jetmetUncertaintiesProducer(Module):
                 "libCondFormatsJetMETObjects", "libPhysicsToolsNanoAODTools"
         ]:
             if library not in ROOT.gSystem.GetLibraries():
-                print("Load Library '%s'" % library.replace("lib", ""))
+                print(("Load Library '%s'" % library.replace("lib", "")))
                 ROOT.gSystem.Load(library)
 
     def getJERsplitID(self, pt, eta):
@@ -203,9 +203,9 @@ class jetmetUncertaintiesProducer(Module):
 
     def beginJob(self):
 
-        print("Loading jet energy scale (JES) uncertainties from file '%s'" %
+        print(("Loading jet energy scale (JES) uncertainties from file '%s'" %
               os.path.join(self.jesInputFilePath,
-                           self.jesUncertaintyInputFileName))
+                           self.jesUncertaintyInputFileName)))
         #self.jesUncertainty = ROOT.JetCorrectionUncertainty(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName))
 
         self.jesUncertainty = {}
@@ -323,7 +323,7 @@ class jetmetUncertaintiesProducer(Module):
                     "%s_T1Smear_phi_unclustEn%s" % (self.metBranchName, shift), "F")
 
         self.isV5NanoAOD = hasattr(inputTree, "Jet_muonSubtrFactor")
-        print("nanoAODv5 or higher: " + str(self.isV5NanoAOD))
+        print(("nanoAODv5 or higher: " + str(self.isV5NanoAOD)))
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass

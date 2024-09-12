@@ -63,7 +63,7 @@ if __name__ == "__main__":
         mods = dir(obj)
         for name in selnames:
             if name in mods:
-                print("Loading %s from %s " % (name, mod))
+                print(("Loading %s from %s " % (name, mod)))
                 if type(getattr(obj, name)) == list:
                     for mod in getattr(obj, name):
                         modules.append(mod())
